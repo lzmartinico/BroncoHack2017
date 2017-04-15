@@ -11,24 +11,6 @@ def distance_matrix(client, origins, destinations,
         "destinations": convert.location_list(destinations)
     }
 
-    if mode:
-        # NOTE(broady): the mode parameter is not validated by the Maps API
-        # server. Check here to prevent silent failures.
-        if mode not in ["driving", "walking", "bicycling", "transit"]:
-            raise ValueError("Invalid travel mode.")
-        params["mode"] = mode
-
-    if language:
-        params["language"] = language
-
-    if avoid:
-        if avoid not in ["tolls", "highways", "ferries"]:
-            raise ValueError("Invalid route restriction.")
-        params["avoid"] = avoid
-
-    if units:
-        params["units"] = units
-
     if departure_time:
         params["departure_time"] = convert.time(departure_time)
 
