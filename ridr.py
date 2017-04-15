@@ -9,6 +9,8 @@ date = argv[4]
 category = argv[5]
 '''
 #things = argv
+import requests
+r = requests.get('https://maps.googleapis.com/maps/api/distancematrix/json?origins=Oakland&destinations=San%20Francisco&key=AIzaSyB21SUWi8UIy-WVLbzOOOAbDugp05LcPz8')
 
 
 #google maps API
