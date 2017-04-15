@@ -1,89 +1,53 @@
 import sys
-print ('sys.argv[5]')
+import json
+from datetime import datetime
+from dateutil.parser import parse
+import MySQLdb
+
 
 #From PHP 
-'''username = argv[1]
-source = argv[2]
-destination = argv[3]
-date = argv[4]
-category = argv[5]
-'''
-#things = argv
+username = sys.argv[1]
+source = sys.argv[2]
+destination = sys.argv[3]
+unfdate = sys.argv[4]
+category = sys.argv[5]
+sessionid = sys.argv[6]
+
+date = unfdate[0:10]
+
+
 import requests
-r = requests.get('https://maps.googleapis.com/maps/api/distancematrix/json?origins=Oakland&destinations=San%20Francisco&key=AIzaSyB21SUWi8UIy-WVLbzOOOAbDugp05LcPz8')
+url = 'https://maps.googleapis.com/maps/api/directions/json'
+params = dict(
+    origin=source,
+    destination=destination,
+    key='AIzaSyB21SUWi8UIy-WVLbzOOOAbDugp05LcPz8'
+    )
+resp = requests.get(url=url,params=params)
+data=json.loads(resp.text)
+
+steps = data['routes'][0]['legs'][0]['steps']
+
+for step in steps:
+	geoloc +=str(step['start_location']['lat'])+","+str(step['start_location']['lng']) + "|" 
+	
 
 
-#google maps API
-
-try:
-  from setuptools import setup
-except ImportError:
-  from distutils.core import setup
-
-if sys.version_info <= (2, 4):
-  error = 'Requires Python Version 2.5 or above... exiting.'
-  print >> sys.stderr, error
-  sys.exit(1)
-
-
-#requirements = [
- #   'requests<=2.11.1',
-#]
-
-setup(name='googlemaps',
-      version='2.4.6-dev',
-      description='Python client library for Google Maps API Web Services',
-      scripts=[],
-      url='https://github.com/googlemaps/google-maps-services-python',
-      packages=['googlemaps'],
-      license='Apache 2.0',
-      platforms='Posix; MacOS X; Windows',
-      #setup_requires=requirements,
-      #install_requires=requirements,
-      classifiers=['Development Status :: 4 - Beta',
-                   'Intended Audience :: Developers',
-                   'License :: OSI Approved :: Apache Software License',
-                   'Operating System :: OS Independent',
-                   'Programming Language :: Python :: 2.7',
-                   'Programming Language :: Python :: 3.2',
-                   'Programming Language :: Python :: 3.4',
-                   'Programming Language :: Python :: 3.5',
-                   'Programming Language :: Python :: 3.6',
-                   'Topic :: Internet',
-                   ]
-      )
-
-print ("hello")
-
-from googlemaps import GoogleMaps
-gmaps = GoogleMaps(api_key)
-from googlemaps import convert
-from googlemaps.convert import as_list
-from gmaps import distance_matrix
-parameters = distance_matrix()
-
-print ('parameters')
-
-'''def SQL_connection():
 #MYSQL Connection
-import MySQLdb
-conn = MySQLdb.connect(host= "54.153.76.72",
+conn1 = MySQLdb.connect(host= "54.153.76.72",
                   user="ridrdbreader",
                   passwd="ridrdbreader",
                   db="ridrDB")
-x = conn.cursor()
+x = conn1.cursor()
 
-
-#getting route
-def get_route(): 
 if category == "d":
 	try:
-   		x.execute("""INSERT INTO `rides`(`source`, `dest`, `ridedate`, `route`) VALUES ("source","destination","date", )""",(188,90))
-   		conn.commit()
-	
+   		x.execute("""INSERT IGNORE INTO `rides`(`source`, `destination`, `ridedate`, `userid`, `sessionid`, `category`,`route`) VALUES (%s, %s, %s, %s, %s, %s, %s)""",(source,destination,date, username, sessionid, category, geoloc ))
+   		conn.commit()	
 
 	except:
-   		conn.rollback()
+   		conn1.rollback()
 
-conn.close()
-'''
+conn1.close()
+
+
